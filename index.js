@@ -4,8 +4,12 @@ const inquirer = require('inquirer')
 const writeFileAsync = util.promisify(fs.writeFile);
 const generatePage = require("./utils/generate");
 
+const Manger = require("./lib/manager");
+const Engineer = require("./lib/engineer");
+const Intern = require("./lib/intern");
 
-const questions = () => {
+
+const managerPrompt = () => {
     return inquirer
         .prompt([
             {
@@ -25,7 +29,13 @@ const questions = () => {
                 name: 'office',
                 message: 'Office Number?'
             },
+])
+    .then
+};
 
+const engineerPrompt = () => {
+    return inquirer
+    .prompt([
             {
                 type: 'input',
                 name: 'username',
@@ -45,25 +55,13 @@ const questions = () => {
             },
 
             {
-                type: 'checkbox',
+                type: 'list',
                 name: 'more',
                 message: 'Add additional team members?',
                 choices: ['Engineer', 'Intern'],
                 when: (data) => data.add === true,
             },
 
-            {
-                type: 'input',
-                name: 'engName',
-                message: 'Engineer name?',
-                when: (data) => data.more === 'Engineer',
-            },
-            {
-                type: 'input',
-                name: 'intName',
-                message: 'Intern name?',
-                when: (data) => data.more === 'Intern',
-            },
 
         ])
 }
@@ -76,3 +74,5 @@ const init = () => {
 }
 
 init();
+
+module.exports = questions
