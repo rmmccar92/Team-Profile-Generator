@@ -3,8 +3,7 @@ const util = require('util');
 const inquirer = require('inquirer')
 const writeFileAsync = util.promisify(fs.writeFile);
 const generatePage = require("./utils/generate");
-
-const Manger = require("./lib/manager");
+const Manager = require("./lib/manager");
 const Engineer = require("./lib/engineer");
 const Intern = require("./lib/intern");
 
@@ -29,17 +28,31 @@ const managerPrompt = () => {
                 name: 'office',
                 message: 'Office Number?'
             },
+
+            {
+                type: 'input',
+                name: 'email',
+                message: 'Email address?'
+            },
 ])
-    .then
+    .then(data => {
+        const manager = new Manager(data.name, data.id, data.email, data.office)
+    }) 
 };
 
-const engineerPrompt = () => {
+const employeePrompt = () => {
     return inquirer
     .prompt([
             {
                 type: 'input',
-                name: 'username',
-                message: 'Github username?'
+                name: 'name',
+                message: 'Name?'
+            },
+            
+            {
+                type: 'input',
+                name: 'id',
+                message: 'Employee ID?'
             },
 
             {
@@ -49,21 +62,36 @@ const engineerPrompt = () => {
             },
 
             {
-                type: 'confirm',
-                name: 'add',
-                message: 'Add engineer or intern?',
-            },
-
-            {
                 type: 'list',
-                name: 'more',
-                message: 'Add additional team members?',
+                name: 'role',
+                message: 'Employee role?',
                 choices: ['Engineer', 'Intern'],
-                when: (data) => data.add === true,
             },
 
+           {
+               type: 'input',
+               name: 'username',
+               message: 'Github username?',
+               when: (data) => data.role = 'Engineer',
+           },
 
+           {
+               type: 'input',
+               name: 'school', 
+               message: 'School name?',
+               when: (data) => data.role = 'Intern',
+           },
+
+           {
+            type: 'confirm',
+            name: 'add',
+            message: "Add more team members?",
+            default: false
+        },
         ])
+        .then(data => {
+            const employee = new `${data.role}`(data.name, data.id, data.email, data.office)
+        });
 }
 
 const init = () => {
@@ -74,5 +102,3 @@ const init = () => {
 }
 
 init();
-
-module.exports = questions
