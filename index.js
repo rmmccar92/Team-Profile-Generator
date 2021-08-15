@@ -2,11 +2,11 @@ const fs = require('fs');
 const util = require('util');
 const inquirer = require('inquirer')
 const writeFileAsync = util.promisify(fs.writeFile);
-const generatePage = require("./utils/generate");
 const Manager = require("./lib/manager");
 const Engineer = require("./lib/engineer");
 const Intern = require("./lib/intern");
-
+const assignCards = require('./utils/generate');
+const teamArr = []
 
 const managerPrompt = () => {
     return inquirer
@@ -34,21 +34,36 @@ const managerPrompt = () => {
                 name: 'email',
                 message: 'Email address?'
             },
-])
-    .then(data => {
-        const manager = new Manager(data.name, data.id, data.email, data.office)
-    }) 
+
+            {
+                type: 'confirm',
+                name: 'add',
+                message: "Add more team members?",
+                default: false
+            },
+        ])
+        .then((data) => {
+            const manager = new Manager(data.name, data.id, data.email, data.office)
+            teamArr.push(manager);
+        })
 };
 
 const employeePrompt = () => {
     return inquirer
-    .prompt([
+        .prompt([
+            {
+                type: 'list',
+                name: 'role',
+                message: 'Employee role?',
+                choices: ['Engineer', 'Intern'],
+            },
+
             {
                 type: 'input',
                 name: 'name',
                 message: 'Name?'
             },
-            
+
             {
                 type: 'input',
                 name: 'id',
@@ -62,43 +77,55 @@ const employeePrompt = () => {
             },
 
             {
-                type: 'list',
-                name: 'role',
-                message: 'Employee role?',
-                choices: ['Engineer', 'Intern'],
+                type: 'input',
+                name: 'username',
+                message: 'Github username?',
+                when: (data) => data.role === 'Engineer',
             },
 
-           {
-               type: 'input',
-               name: 'username',
-               message: 'Github username?',
-               when: (data) => data.role = 'Engineer',
-           },
+            {
+                type: 'input',
+                name: 'school',
+                message: 'School name?',
+                when: (data) => data.role === 'Intern',
+            },
 
-           {
-               type: 'input',
-               name: 'school', 
-               message: 'School name?',
-               when: (data) => data.role = 'Intern',
-           },
-
-           {
-            type: 'confirm',
-            name: 'add',
-            message: "Add more team members?",
-            default: false
-        },
+            {
+                type: 'confirm',
+                name: 'add',
+                message: "Add more team members?",
+                default: false
+            },
         ])
         .then(data => {
-            const employee = new `${data.role}`(data.name, data.id, data.email, data.office)
-        });
-}
+            const { name, id, email, username, school, role, add, } = data;
+            let employee;
+            if (role === "Engineer") {
+                employee = new Engineer(name, id, email, username);
+            }
+            else if (role === "Intern") {
+                employee = new Intern(name, id, email, school);
+            }
+            teamArr.push(employee);
+            if (add === true) {
+                // module.exports = team
+                return employeePrompt()
+            }
+            else {
+                // console.log(team);
+                return teamArr;
+            }
+
+        })
+};
+
 
 const init = () => {
-    questions()
-        .then((data) => writeFileAsync('index.HTML', generatePage(data)))
+    managerPrompt()
+        .then(employeePrompt)
+        .then(() => writeFileAsync('./dist/index.html', assignCards(teamArr)))
         .then(() => console.log('Team Profile Generated'))
         .catch((err) => console.log(err))
 }
 
-init();
+init()
