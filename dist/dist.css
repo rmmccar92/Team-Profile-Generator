@@ -1,0 +1,8 @@
+.card {
+    box-shadow: 0 0 1em 0;
+    background-color: rgb(255, 254, 249);
+}
+
+.btn {
+    margin: .25em;
+}
