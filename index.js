@@ -32,7 +32,17 @@ const managerPrompt = () => {
             {
                 type: 'input',
                 name: 'email',
-                message: 'Email address?'
+                message: 'Email address?',
+                default: () => {},
+                validate: function (email) {
+                    valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+                    if (valid) {
+                        return true;
+                    } else {
+                        console.log(".  Please enter a valid email")
+                        return false;
+                    }
+                }
             },
 
             {
@@ -73,7 +83,17 @@ const employeePrompt = () => {
             {
                 type: 'input',
                 name: 'email',
-                message: 'Email address?'
+                message: 'Email address?',
+                default: () => {},
+                validate: function (email) {
+                    valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+                    if (valid) {
+                        return true;
+                    } else {
+                        console.log(".  Please enter a valid email")
+                        return false;
+                    }
+                }
             },
 
             {
